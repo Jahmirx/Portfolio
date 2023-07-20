@@ -38,22 +38,27 @@ def contact_view(request):
         
         if request.method == 'POST':
             form = ContactForm(request.POST)
-            
-            name = request.POST.get('name')
-            email = request.POST.get('email')
-            message = request.POST.get('message')
-            
-            # Perform any necessary actions with the form data
-            # For example, you can save the data to the database or send an email
-            send_mail(
-                'Contact Form Submission from {}'.format(name),
-                message,
-                'form-response@example.com',
-                ['landoulsi.emir@gmail.com'],
-                fail_silently=False,
-            )
+            if form.is_valid():
+                name = request.POST.get('name')
+                email = request.POST.get('email')
+                message = request.POST.get('message')
+                
+                # Perform any necessary actions with the form data
+                # For example, you can save the data to the database or send an email
+                send_mail(
+                    'Contact Form Submission from {}'.format(name),
+                    message,
+                    'form-response@example.com',
+                    ['landoulsi.emir@gmail.com'],
+                    fail_silently=False,
+                )
+                contact = Contact(name=name, email=email, message=message)
+                contact.save()
 
-            return HttpResponse('Votre message a été envoyé avec succès.')  # Render a success page or redirect as desired
+                messages.success(request, 'Your message has been sent successfully.')
+                
+        else:
+            form = ContactForm()
 
         return render(request, 'home.html')  # Render the contact form template
 
